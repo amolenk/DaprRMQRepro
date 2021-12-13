@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  catalog-api:
+    image: ${REGISTRY:-eshopdapr}/catalog.api:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
+    depends_on:
+      - rabbitmq
+
+  catalog-api-dapr:
+    image: "daprio/daprd:1.5.1"
+    network_mode: "service:catalog-api"
+    depends_on:
+      - catalog-api
